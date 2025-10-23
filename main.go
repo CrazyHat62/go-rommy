@@ -17,6 +17,6 @@ func main() {
 	defer file.Close()
 	var line string
 	line, err = sa.ParseAtlas(reader)
-	println(line, err)
+	println(line, err.Error())
 
 }
