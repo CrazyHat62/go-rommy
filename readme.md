@@ -1,0 +1,1 @@
+replace spriteatlas => ../spriteatlas // Relative path example from mod
