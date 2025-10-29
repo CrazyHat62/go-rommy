@@ -7,10 +7,14 @@ import (
 )
 
 func main() {
+    
 
-	err := sa.Spriteatlas("", "atiles.atlas")
+	page, region, err := sa.Spriteatlas("", "atiles.atlas")
 	if err != nil {
 		os.Exit(1)
 	}
+	println(page.PageToStr())
+    println(region.RegionToStr())
+    println(err)
 
 }
