@@ -15,5 +15,7 @@ func main() {
 	println(page.PageToStr())
 	println(region.RegionToStr())
 	println(err)
-
+	for _, key := range region.AnimKeys() {
+		println(key)
+	}
 }
