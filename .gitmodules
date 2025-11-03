@@ -1,0 +1,3 @@
+[submodule "libs/spriteatlas"]
+	path = libs/spriteatlas
+	url = git@github.com:CrazyHat62/spriteatlas.git
