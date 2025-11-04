@@ -36,7 +36,7 @@ func main() {
 
 	var nextFrame int = 0
 	var framesCounter int = 0
-	var framesSpeed int = 5
+	var framesSpeed int = 2
 	var rect sa.RECT
 
 	idx := 0
