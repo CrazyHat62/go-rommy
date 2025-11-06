@@ -13,6 +13,12 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+// type Sprite struct {
+// 	name string
+// 	rect sa.RECT
+// 	frame int
+// }
+
 func main() {
 	var ScreenWidth int32 = 1729
 	var ScreenHeight int32 = 874
@@ -35,31 +41,29 @@ func main() {
 	rl.SetTargetFPS(int32(FPS))
 
 	var nextFrame int = 0
+	var maxFrames int = 12
 	var framesCounter int = 0
-	var framesSpeed int = 2
+
+	var gameSpeed int = 2
+
 	var rect sa.RECT
 
-	idx := 0
 	for !rl.WindowShouldClose() {
 		framesCounter++
 
-		if framesCounter >= (60 / framesSpeed) {
+		if framesCounter >= (FPS / gameSpeed) {
 			framesCounter = 0
-			region := page.Regions["player_walk"]
-			rect, nextFrame, err = region.GetSpriteFrame("north", nextFrame)
+			playerWalk := page.Regions["player_walk"]
+			rect, err = playerWalk.GetFrameRect("north", nextFrame)
 			if err != nil {
 				println(err.Error())
 				os.Exit(1)
 			}
+			nextFrame++
+			nextFrame = nextFrame % maxFrames
 
 		}
 
-		//rect, err := region.GetAnimation("north", idx)
-		if err != nil {
-			println(err.Error())
-			os.Exit(1)
-		}
-		idx++
 		frameRec := rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		rl.BeginDrawing()
 
