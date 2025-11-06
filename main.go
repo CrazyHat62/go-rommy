@@ -19,7 +19,7 @@ func main() {
 	rl.InitWindow(ScreenWidth, ScreenHeight, "raylib [textures] example - sprite animation")
 	defer rl.CloseWindow()
 
-	page, region, err := sa.Spriteatlas("", "atiles.atlas")
+	page, err := sa.Spriteatlas("", "atiles.atlas")
 	if err != nil {
 		os.Exit(1)
 	}
@@ -28,8 +28,8 @@ func main() {
 	if page.Alpha_color != "" {
 		img = makeImgAlphaTransparent(page.Name, targetColor)
 	}
-	scarfy := rl.LoadTextureFromImage(img)
-	defer rl.UnloadTexture(scarfy)
+	spriteSheet1 := rl.LoadTextureFromImage(img)
+	defer rl.UnloadTexture(spriteSheet1)
 
 	FPS := 60
 	rl.SetTargetFPS(int32(FPS))
@@ -45,8 +45,8 @@ func main() {
 
 		if framesCounter >= (60 / framesSpeed) {
 			framesCounter = 0
-
-			rect, nextFrame, err = region.GetAnimation("north", nextFrame)
+			region := page.Regions["player_walk"]
+			rect, nextFrame, err = region.GetSpriteFrame("north", nextFrame)
 			if err != nil {
 				println(err.Error())
 				os.Exit(1)
@@ -65,9 +65,9 @@ func main() {
 
 		//Background
 		rl.ClearBackground(rl.RayWhite)
-		rl.DrawTexture(scarfy, 15, 40, rl.RayWhite)
+		rl.DrawTexture(spriteSheet1, 15, 40, rl.RayWhite)
 		//lines around the spritesheet
-		rl.DrawRectangleLines(15, 40, scarfy.Width, scarfy.Height, rl.Lime)
+		rl.DrawRectangleLines(15, 40, spriteSheet1.Width, spriteSheet1.Height, rl.Lime)
 
 		// Slide colored squares indicator for speed control
 		for i := 0; i < 60; i++ {
@@ -80,68 +80,11 @@ func main() {
 		rl.DrawRectangleLines(15+int32(frameRec.X), 40+int32(frameRec.Y), int32(frameRec.Width), int32(frameRec.Height), rl.Red)
 		//position := rl.Vector2{X: 350.0, Y: 280.0}
 		// Draw the sprite texture
-		rl.DrawTextureRec(scarfy, frameRec, rl.Vector2{X: 350.0, Y: 280.0}, rl.White)
+		rl.DrawTextureRec(spriteSheet1, frameRec, rl.Vector2{X: 350.0, Y: 280.0}, rl.White)
 
 		rl.EndDrawing()
 	}
 
-	// println(page.PageToStr())
-	// println(region.RegionToStr())
-	// if err != nil {
-	// 	println("err is " + err.Error())
-	// } else {
-	// 	println("no errors ")
-	// }
-	// for _, key := range region.AnimKeys() {
-	// 	println(key)
-	// }
-	// rect1, err := region.GetAnimation("north", 0)
-	// rect2, err := region.GetAnimation("north", 1)
-	// rect3, err := region.GetAnimation("north", 2)
-	// rect4, err := region.GetAnimation("north", 3)
-
-	// rect31, err := region.GetAnimation("west", 0)
-	// rect32, err := region.GetAnimation("west", 1)
-	// rect33, err := region.GetAnimation("west", 2)
-	// rect34, err := region.GetAnimation("west", 3)
-
-	// rect21, err := region.GetAnimation("south", 0)
-	// rect22, err := region.GetAnimation("south", 1)
-	// rect23, err := region.GetAnimation("south", 2)
-	// rect24, err := region.GetAnimation("south", 3)
-
-	// rect11, err := region.GetAnimation("east", 0)
-	// rect12, err := region.GetAnimation("east", 1)
-	// rect13, err := region.GetAnimation("east", 2)
-	// rect14, err := region.GetAnimation("east", 3)
-
-	// if err != nil {
-	// 	println(err.Error())
-	// } else {
-	// 	println(rect1.RectToStr())
-	// 	println(rect2.RectToStr())
-	// 	println(rect3.RectToStr())
-	// 	println(rect4.RectToStr())
-	// 	println("")
-
-	// 	println(rect11.RectToStr())
-	// 	println(rect12.RectToStr())
-	// 	println(rect13.RectToStr())
-	// 	println(rect14.RectToStr())
-	// 	println("")
-
-	// 	println(rect21.RectToStr())
-	// 	println(rect22.RectToStr())
-	// 	println(rect23.RectToStr())
-	// 	println(rect24.RectToStr())
-	// 	println("")
-
-	// 	println(rect31.RectToStr())
-	// 	println(rect32.RectToStr())
-	// 	println(rect33.RectToStr())
-	// 	println(rect34.RectToStr())
-
-	// }
 }
 
 func colorFromStr(aColor string) color.RGBA {

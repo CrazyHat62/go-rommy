@@ -12,3 +12,9 @@
 
 page atiles.bmp 255,0,255,255 true 1729,874 1,1,1,1
 region player_walk 1,148,384,243 48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
+region player_push 385,148,768,243 48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
+region ball        913,148,1296,243 48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
+region fireball    1,245,384,340 48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
+region ant         385,245,768,340 48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
+region paramacium  769,245,1152,340 48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
+region teeth       1153,245,1536,340 48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
