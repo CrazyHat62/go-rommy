@@ -50,8 +50,10 @@ func main() {
 
 	playerWalk := page.Regions["player_walk"]
 	antWalk := page.Regions["ant"]
+	water := page.Regions["water"]
 	var playerRect rl.Rectangle
 	var antRect rl.Rectangle
+	var waterRect rl.Rectangle
 
 	for !rl.WindowShouldClose() {
 		framesCounter++
@@ -77,8 +79,14 @@ func main() {
 		if err == nil {
 			antRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		}
+		rect, err = water.GetFrameRect("water", nextFrame)
+		if err == nil {
+			waterRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+		}
+
 		rl.DrawTextureRec(spriteSheet1, playerRect, rl.Vector2{X: 350.0, Y: 280.0}, rl.White)
 		rl.DrawTextureRec(spriteSheet1, antRect, rl.Vector2{X: 400.0, Y: 280.0}, rl.White)
+		rl.DrawTextureRec(spriteSheet1, waterRect, rl.Vector2{X: 450.0, Y: 280.0}, rl.White)
 		rl.EndDrawing()
 	}
 
