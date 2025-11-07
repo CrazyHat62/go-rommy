@@ -38,8 +38,9 @@ func main() {
 	spriteSheet1 := rl.LoadTextureFromImage(img)
 	defer rl.UnloadTexture(spriteSheet1)
 
+	//Framerate needs fixing
 	var gameSpeed int = 5
-	FPS := gameSpeed
+	FPS := gameSpeed * 4 //4 frames for each tile
 	rl.SetTargetFPS(int32(FPS))
 
 	var rect sa.RECT
@@ -75,13 +76,13 @@ func main() {
 		rect, waterAf, err = water.GetFrameRect("water", waterAf)
 		if err == nil {
 			waterRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
-			//fmt.Printf("water X:%v Y:%v Width:%v Height:%v\n", rect.X, rect.Y, rect.Width, rect.Height)
 		}
 
 		rl.DrawTextureRec(spriteSheet1, playerRect, rl.Vector2{X: 350.0, Y: 280.0}, rl.White)
 		rl.DrawTextureRec(spriteSheet1, antRect, rl.Vector2{X: 400.0, Y: 280.0}, rl.White)
 		rl.DrawTextureRec(spriteSheet1, waterRect, rl.Vector2{X: 450.0, Y: 280.0}, rl.White)
-		rl.DrawText(str, 500.0, 280.0, 10, rl.Black)
+		rl.DrawText(str, 500.0, 280.0, 40, rl.Black)
+		rl.DrawFPS(550,280)
 
 		rl.EndDrawing()
 
