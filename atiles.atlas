@@ -11,16 +11,16 @@
 # frame contains : name index size pos ... and may be anywhere in the spritesheet, and in order in spriteAtlas
 
 page atiles.bmp 255,0,255,255 true 1729,874 1,1,1,1
-region floor       1,1,48,48         48,48 tile,1,1,1  gravel,27,1,1 dirt,28,1,1
-region water       1345,1,48,48      48,48 water,1,1,8
-region chevron     49,1,1008,48      48,48 north,1,1,4 west,5,1,4 south,9,1,4 east,13,1,4 random,17,1,4
-region ice         1009,1,1248,48    48,48 any,1,1,1   se_cnr,2,1,1 sw_cnr,3,1,1 ne_cnr,4,1,1 nw_cnr,5,1,1
+region floor       1,1         48,48 tile,1,1,1  gravel,27,1,1 dirt,28,1,1
+region water       1345,1      48,48 water,1,1,8
+region chevron     49,1        48,48 north,1,1,4 west,5,1,4    south,9,1,4  east,13,1,4  random,17,1,4
+region ice         1009,1      48,48 any,1,1,1   se_cnr,2,1,1  sw_cnr,3,1,1 ne_cnr,4,1,1 nw_cnr,5,1,1
 
-region player_walk 1,148,384,243     48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
-region player_push 385,148,768,243   48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
-region ball        913,148,1296,243  48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
-region plane       1297,148,1680,243 48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
-region fireball    1,245,384,340     48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
-region ant         385,245,768,340   48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
-region paramacium  769,245,1152,340  48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
-region teeth       1153,245,1536,340 48,48 north,1,1,4 west,5,1,4 south,1,2,4 east,5,2,4
+region player_walk 1,148       48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region player_push 385,148     48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region ball        913,148     48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region plane       1297,148    48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region fireball    1,245       48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region ant         385,245     48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region paramacium  769,245     48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region teeth       1153,245    48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4

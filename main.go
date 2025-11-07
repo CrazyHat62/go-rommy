@@ -37,14 +37,13 @@ func main() {
 	spriteSheet1 := rl.LoadTextureFromImage(img)
 	defer rl.UnloadTexture(spriteSheet1)
 
-	FPS := 60
+	var gameSpeed int = 5
+	FPS := gameSpeed
 	rl.SetTargetFPS(int32(FPS))
 
 	var nextFrame int = 0
 	var maxFrames int = 12
 	var framesCounter int = 0
-
-	var gameSpeed int = 5
 
 	var rect sa.RECT
 
@@ -82,6 +81,8 @@ func main() {
 		rect, err = water.GetFrameRect("water", nextFrame)
 		if err == nil {
 			waterRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+		} else {
+			println("foo water")
 		}
 
 		rl.DrawTextureRec(spriteSheet1, playerRect, rl.Vector2{X: 350.0, Y: 280.0}, rl.White)
