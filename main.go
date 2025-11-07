@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"os"
@@ -41,54 +42,49 @@ func main() {
 	FPS := gameSpeed
 	rl.SetTargetFPS(int32(FPS))
 
-	var nextFrame int = 0
-	var maxFrames int = 12
-	var framesCounter int = 0
-
 	var rect sa.RECT
 
 	playerWalk := page.Regions["player_walk"]
+	playerAf := 0
 	antWalk := page.Regions["ant"]
+	antAf := 0
 	water := page.Regions["water"]
+	waterAf := 0
 	var playerRect rl.Rectangle
 	var antRect rl.Rectangle
 	var waterRect rl.Rectangle
 
 	for !rl.WindowShouldClose() {
-		framesCounter++
-
-		if framesCounter >= (FPS / gameSpeed) {
-			framesCounter = 0
-
-			nextFrame++
-			nextFrame = nextFrame % maxFrames
-
-		}
 
 		rl.BeginDrawing()
 
 		//Background
 		rl.ClearBackground(rl.RayWhite)
 
-		rect, err = playerWalk.GetFrameRect("north", nextFrame)
+		rect, playerAf, err = playerWalk.GetFrameRect("north", playerAf)
 		if err == nil {
 			playerRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		}
-		rect, err = antWalk.GetFrameRect("north", nextFrame)
+		rect, antAf, err = antWalk.GetFrameRect("north", antAf)
 		if err == nil {
 			antRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		}
-		rect, err = water.GetFrameRect("water", nextFrame)
+
+		str := fmt.Sprintf("%v", waterAf)
+
+		rect, waterAf, err = water.GetFrameRect("water", waterAf)
 		if err == nil {
 			waterRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
-		} else {
-			println("foo water")
+			//fmt.Printf("water X:%v Y:%v Width:%v Height:%v\n", rect.X, rect.Y, rect.Width, rect.Height)
 		}
 
 		rl.DrawTextureRec(spriteSheet1, playerRect, rl.Vector2{X: 350.0, Y: 280.0}, rl.White)
 		rl.DrawTextureRec(spriteSheet1, antRect, rl.Vector2{X: 400.0, Y: 280.0}, rl.White)
 		rl.DrawTextureRec(spriteSheet1, waterRect, rl.Vector2{X: 450.0, Y: 280.0}, rl.White)
+		rl.DrawText(str, 500.0, 280.0, 10, rl.Black)
+
 		rl.EndDrawing()
+
 	}
 
 }
