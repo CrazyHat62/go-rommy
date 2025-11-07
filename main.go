@@ -44,27 +44,30 @@ func main() {
 	var maxFrames int = 12
 	var framesCounter int = 0
 
-	var gameSpeed int = 2
+	var gameSpeed int = 30
 
 	var rect sa.RECT
+
+	playerWalk := page.Regions["player_walk"]
 
 	for !rl.WindowShouldClose() {
 		framesCounter++
 
 		if framesCounter >= (FPS / gameSpeed) {
 			framesCounter = 0
-			playerWalk := page.Regions["player_walk"]
-			rect, err = playerWalk.GetFrameRect("north", nextFrame)
-			if err != nil {
-				println(err.Error())
-				os.Exit(1)
-			}
+
 			nextFrame++
 			nextFrame = nextFrame % maxFrames
 
 		}
 
+		rect, err = playerWalk.GetFrameRect("north", nextFrame)
+		if err != nil {
+			println(err.Error())
+			os.Exit(1)
+		}
 		frameRec := rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+
 		rl.BeginDrawing()
 
 		//Background
@@ -74,11 +77,11 @@ func main() {
 		rl.DrawRectangleLines(15, 40, spriteSheet1.Width, spriteSheet1.Height, rl.Lime)
 
 		// Slide colored squares indicator for speed control
-		for i := 0; i < 60; i++ {
-			if int32(i) < 60 { //?
+		for i := 0; i < FPS; i++ {
+			if int32(i) < int32(gameSpeed) { //?
 				rl.DrawRectangle(int32(250+21*i), 205, 20, 20, rl.Red)
 			}
-			rl.DrawRectangleLines(int32(250+21*i), 205, 20, 20, rl.Maroon)
+			rl.DrawRectangleLines(int32(250+21*i), 205, 20, 20, rl.Orange)
 		}
 		// Show the rectange selection on the sprite
 		rl.DrawRectangleLines(15+int32(frameRec.X), 40+int32(frameRec.Y), int32(frameRec.Width), int32(frameRec.Height), rl.Red)
