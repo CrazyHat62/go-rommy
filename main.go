@@ -44,11 +44,14 @@ func main() {
 	var maxFrames int = 12
 	var framesCounter int = 0
 
-	var gameSpeed int = 30
+	var gameSpeed int = 5
 
 	var rect sa.RECT
 
 	playerWalk := page.Regions["player_walk"]
+	antWalk := page.Regions["ant"]
+	var playerRect rl.Rectangle
+	var antRect rl.Rectangle
 
 	for !rl.WindowShouldClose() {
 		framesCounter++
@@ -61,34 +64,21 @@ func main() {
 
 		}
 
-		rect, err = playerWalk.GetFrameRect("north", nextFrame)
-		if err != nil {
-			println(err.Error())
-			os.Exit(1)
-		}
-		frameRec := rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
-
 		rl.BeginDrawing()
 
 		//Background
 		rl.ClearBackground(rl.RayWhite)
-		rl.DrawTexture(spriteSheet1, 15, 40, rl.RayWhite)
-		//lines around the spritesheet
-		rl.DrawRectangleLines(15, 40, spriteSheet1.Width, spriteSheet1.Height, rl.Lime)
 
-		// Slide colored squares indicator for speed control
-		for i := 0; i < FPS; i++ {
-			if int32(i) < int32(gameSpeed) { //?
-				rl.DrawRectangle(int32(250+21*i), 205, 20, 20, rl.Red)
-			}
-			rl.DrawRectangleLines(int32(250+21*i), 205, 20, 20, rl.Orange)
+		rect, err = playerWalk.GetFrameRect("north", nextFrame)
+		if err == nil {
+			playerRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		}
-		// Show the rectange selection on the sprite
-		rl.DrawRectangleLines(15+int32(frameRec.X), 40+int32(frameRec.Y), int32(frameRec.Width), int32(frameRec.Height), rl.Red)
-		//position := rl.Vector2{X: 350.0, Y: 280.0}
-		// Draw the sprite texture
-		rl.DrawTextureRec(spriteSheet1, frameRec, rl.Vector2{X: 350.0, Y: 280.0}, rl.White)
-
+		rect, err = antWalk.GetFrameRect("north", nextFrame)
+		if err == nil {
+			antRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+		}
+		rl.DrawTextureRec(spriteSheet1, playerRect, rl.Vector2{X: 350.0, Y: 280.0}, rl.White)
+		rl.DrawTextureRec(spriteSheet1, antRect, rl.Vector2{X: 400.0, Y: 280.0}, rl.White)
 		rl.EndDrawing()
 	}
 
