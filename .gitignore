@@ -1,1 +1,2 @@
-libs\spiteatlas\*
+*.exe
+libs/spriteatlas
