@@ -11,16 +11,96 @@
 # frame contains : name index size pos ... and may be anywhere in the spritesheet, and in order in spriteAtlas
 
 page atiles.bmp 255,0,255,255 true 1729,874 1,1,1,1
-region floor       1,1         48,48 tile,1,1,1  gravel,27,1,1 dirt,28,1,1
-region water       1345,1      48,48 water,1,1,8
-region chevron     49,1        48,48 north,1,1,4 west,5,1,4    south,9,1,4  east,13,1,4  random,17,1,4
-region ice         1009,1      48,48 any,1,1,1   se_cnr,2,1,1  sw_cnr,3,1,1 ne_cnr,4,1,1 nw_cnr,5,1,1
 
-region player_walk 1,148       48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
-region player_push 385,148     48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
-region ball        913,148     48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
-region plane       1297,148    48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
-region fireball    1,245       48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
-region ant         385,245     48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
-region paramacium  769,245     48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
-region teeth       1153,245    48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region tiles       1,1         48,48 
+tile,1,1,1  
+force_north,2,1,4 
+force_west,6,1,4    
+force_south,10,1,4  
+force_east,14,1,4  
+force_random,18,1,4
+ice,22,1,1
+ice_se,23,1,1
+ice_sw,24,1,1
+ice_ne,25,1,1
+ice_nw,26,1,1
+gravel,27,1,1 
+dirt,28,1,1
+water,29,1,8
+fire,1,2,6 
+bomb,7,2,4 
+trap,11,2,1 
+thief,12,2,1
+hint,13,2,1
+button_blue,14,2,1
+button_green,15,2,1
+button_red,16,2,1
+button_brown,17,2,1
+teleport,18,2,4
+wall,22,2,1
+wall_n,23,2,1
+wall_w,24,2,1
+wall_s,25,2,1
+wall_e,26,2,1
+wall_se,27,2,1
+wall_blue,28,2,1
+wall_toggle_dn,29,2,4
+wall_toggle_up,33,2,4
+wall_popup,1,3,1
+clone_machine,2,3,4
+door_red,6,3,1
+door_blue,7,3,1
+door_yellow,8,3,1
+door_green,9,3,1
+socket,10,3,1
+exit,11,3,4
+cchip,15,3,1
+key_red,16,3,1
+key_blue,17,3,1
+key_yellow,18,3,1
+key_green,19,3,1
+boot_ice,20,3,1
+boot_force,21,3,1
+boot_fire,22,3,1
+boot_water,23,3,1
+exit_fake,24,3,2
+block,17,4,1
+tank_n,18,4,1
+tank_w,19,4,1
+tank_s,18,5,1
+tank_e,19,5,1
+
+
+region player      1,1         48,48 
+burn,26,3,2
+exit,27,3,1
+splash,28,3,1
+swim_n,29,3,1
+swim_e,30,3,1
+swim_s,31,3,1
+swim_w,32,3,1
+
+walk_north,1,4,4 
+walk_west,5,4,4    
+walk_south,1,5,4  
+walk_east,5,5,4
+
+push_north,9,4,4 
+push_west,13,4,4    
+push_south,9,5,4  
+push_east,13,5,4
+
+region ball             913,148     48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region plane            1297,148    48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region fireball         1,245       48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region ant              385,245     48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region paramacium       769,245     48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+region teeth            1153,245    48,48 north,1,1,4 west,5,1,4    south,1,2,4  east,5,2,4
+
+region_step slime_ns    385,342     48,96 north,1,1,4 south,5,1,4
+region_step slime_ew    385,342     96,48 east,1,2,4  west,5,2,4
+region_step walker_ns   768,342     48,96 north,1,1,4 south,5,1,4
+region_step walker_ew   1152,342    96,48 east,1,2,4  west,5,2,4
+
+region_once once        1,439       144,144 splash,1,1,12 explode,1,2,12 crash,1,3,12
+
