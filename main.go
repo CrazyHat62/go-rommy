@@ -54,6 +54,8 @@ func main() {
 	var playerRect rl.Rectangle
 	var antRect rl.Rectangle
 	var waterRect rl.Rectangle
+	var step bool
+	var loop bool
 
 	for !rl.WindowShouldClose() {
 
@@ -62,18 +64,18 @@ func main() {
 		//Background
 		rl.ClearBackground(rl.RayWhite)
 
-		rect, playerAf, err = playerWalk.GetFrameRect("north", playerAf)
+		rect, playerAf, step, loop, err = playerWalk.GetFrameRect("north", playerAf)
 		if err == nil {
 			playerRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		}
-		rect, antAf, err = antWalk.GetFrameRect("north", antAf)
+		rect, antAf, step, loop, err = antWalk.GetFrameRect("north", antAf)
 		if err == nil {
 			antRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		}
 
 		str := fmt.Sprintf("%v", waterAf)
 
-		rect, waterAf, err = water.GetFrameRect("water", waterAf)
+		rect, waterAf, step, loop, err = water.GetFrameRect("water", waterAf)
 		if err == nil {
 			waterRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		}
@@ -82,7 +84,7 @@ func main() {
 		rl.DrawTextureRec(spriteSheet1, antRect, rl.Vector2{X: 400.0, Y: 280.0}, rl.White)
 		rl.DrawTextureRec(spriteSheet1, waterRect, rl.Vector2{X: 450.0, Y: 280.0}, rl.White)
 		rl.DrawText(str, 500.0, 280.0, 40, rl.Black)
-		rl.DrawFPS(550,280)
+		rl.DrawFPS(550, 280)
 
 		rl.EndDrawing()
 
