@@ -1,5 +1,5 @@
 # Atlas notes
-# strings shouldn't use spaces just yet 
+# strings shouldn't use spaces until quotes are implemented 
 
 # this atlas has contigeous frames in each region
 # region may contain many animations in more than one row

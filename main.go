@@ -45,11 +45,11 @@ func main() {
 
 	var rect sa.RECT
 
-	playerWalk := page.Regions["player_walk"]
+	player := page.Regions["player"]
 	playerAf := 0
 	antWalk := page.Regions["ant"]
 	antAf := 0
-	water := page.Regions["water"]
+	tiles := page.Regions["tiles"]
 	waterAf := 0
 	var playerRect rl.Rectangle
 	var antRect rl.Rectangle
@@ -64,7 +64,7 @@ func main() {
 		//Background
 		rl.ClearBackground(rl.RayWhite)
 
-		rect, playerAf, step, loop, err = playerWalk.GetFrameRect("north", playerAf)
+		rect, playerAf, step, loop, err = player.GetFrameRect("walk_north", playerAf)
 		if err == nil {
 			playerRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		}
@@ -75,11 +75,13 @@ func main() {
 
 		str := fmt.Sprintf("%v", waterAf)
 
-		rect, waterAf, step, loop, err = water.GetFrameRect("water", waterAf)
+		rect, waterAf, step, loop, err = tiles.GetFrameRect("water", waterAf)
 		if err == nil {
 			waterRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		}
-
+		if step || loop { //need to use
+			println("step or loop")
+		}
 		rl.DrawTextureRec(spriteSheet1, playerRect, rl.Vector2{X: 350.0, Y: 280.0}, rl.White)
 		rl.DrawTextureRec(spriteSheet1, antRect, rl.Vector2{X: 400.0, Y: 280.0}, rl.White)
 		rl.DrawTextureRec(spriteSheet1, waterRect, rl.Vector2{X: 450.0, Y: 280.0}, rl.White)
