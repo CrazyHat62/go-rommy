@@ -38,8 +38,8 @@ func main() {
 	spriteSheet1 := rl.LoadTextureFromImage(img)
 	defer rl.UnloadTexture(spriteSheet1)
 
-	//Framerate needs fixing
-	var gameSpeed int = 5
+	//TODO: Framerate needs fixing
+	var gameSpeed int = 1
 	FPS := gameSpeed * 4 //4 frames for each tile
 	rl.SetTargetFPS(int32(FPS))
 
@@ -47,12 +47,12 @@ func main() {
 
 	player := page.Regions["player"]
 	playerAf := 0
-	antWalk := page.Regions["ant"]
-	antAf := 0
-	tiles := page.Regions["tiles"]
-	waterAf := 0
 	var playerRect rl.Rectangle
-	var antRect rl.Rectangle
+	slimeWalk := page.Regions["slime_ew"]
+	slimeAf := 0
+	var slimeRect rl.Rectangle
+	tiles := page.Regions["region1"]
+	waterAf := 0
 	var waterRect rl.Rectangle
 	var step bool
 	var loop bool
@@ -68,12 +68,14 @@ func main() {
 		if err == nil {
 			playerRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		}
-		rect, antAf, step, loop, err = antWalk.GetFrameRect("north", antAf)
+		rect, slimeAf, step, loop, err = slimeWalk.GetFrameRect("east", slimeAf)
 		if err == nil {
-			antRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+			slimeRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		}
 
-		str := fmt.Sprintf("%v", waterAf)
+		strw := fmt.Sprintf("%v", waterAf)
+		strp := fmt.Sprintf("%v", playerAf)
+		strs := fmt.Sprintf("%v", slimeAf)
 
 		rect, waterAf, step, loop, err = tiles.GetFrameRect("water", waterAf)
 		if err == nil {
@@ -82,11 +84,13 @@ func main() {
 		if step || loop { //need to use
 			println("step or loop")
 		}
-		rl.DrawTextureRec(spriteSheet1, playerRect, rl.Vector2{X: 350.0, Y: 280.0}, rl.White)
-		rl.DrawTextureRec(spriteSheet1, antRect, rl.Vector2{X: 400.0, Y: 280.0}, rl.White)
-		rl.DrawTextureRec(spriteSheet1, waterRect, rl.Vector2{X: 450.0, Y: 280.0}, rl.White)
-		rl.DrawText(str, 500.0, 280.0, 40, rl.Black)
-		rl.DrawFPS(550, 280)
+		rl.DrawTextureRec(spriteSheet1, playerRect, rl.Vector2{X: 350.0, Y: 100.0}, rl.White)
+		rl.DrawTextureRec(spriteSheet1, waterRect, rl.Vector2{X: 350.0, Y: 200.0}, rl.White)
+		rl.DrawTextureRec(spriteSheet1, slimeRect, rl.Vector2{X: 350.0, Y: 300.0}, rl.White)
+		rl.DrawText(strp, 500.0, 100.0, 40, rl.Black)
+		rl.DrawText(strw, 500.0, 200.0, 40, rl.Black)
+		rl.DrawText(strs, 500.0, 300.0, 40, rl.Black)
+		rl.DrawFPS(550, 100)
 
 		rl.EndDrawing()
 
