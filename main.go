@@ -22,6 +22,7 @@ type GameSprite struct {
 	frame  int
 	step   bool
 	loop   bool
+	played bool
 }
 
 func main() {
@@ -43,15 +44,15 @@ func main() {
 	defer rl.UnloadTexture(spriteSheet1)
 
 	//TODO: Framerate needs fixing
-	var gameSpeed int = 1
-	FPS := gameSpeed * 4 //4 frames for each tile
+	var gameSpeed int = 4
+	FPS := gameSpeed //4 frames for each tile
 	rl.SetTargetFPS(int32(FPS))
 
 	player := GameSprite{name: "player"}
 	player.region = page.Regions["player"]
 	player.frame = 0
 	player.pos.X = 350.0
-	player.pos.Y = 100.0
+	player.pos.Y = 600.0
 
 	slime := GameSprite{name: "slime"}
 	slime.region = page.Regions["slime_ew"]
@@ -73,6 +74,11 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 
+		strw := fmt.Sprintf("%v", water.frame)
+		strp := fmt.Sprintf("%v", player.frame)
+		strs := fmt.Sprintf("%v", slime.frame)
+		stre := fmt.Sprintf("%v", explode.frame)
+
 		var rect sa.RECT
 		rect, player.frame, player.step, player.loop, err = player.region.GetFrameRect("walk_north", player.frame)
 		if err == nil {
@@ -93,11 +99,6 @@ func main() {
 			explode.rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 		}
 
-		strw := fmt.Sprintf("%v", water.frame)
-		strp := fmt.Sprintf("%v", player.frame)
-		strs := fmt.Sprintf("%v", slime.frame)
-		stre := fmt.Sprintf("%v", explode.frame)
-
 		rl.BeginDrawing()
 
 		//Background
@@ -106,16 +107,38 @@ func main() {
 		rl.DrawTextureRec(spriteSheet1, player.rect, player.pos, rl.White)
 		rl.DrawTextureRec(spriteSheet1, water.rect, water.pos, rl.White)
 		rl.DrawTextureRec(spriteSheet1, slime.rect, slime.pos, rl.White)
-		rl.DrawTextureRec(spriteSheet1, explode.rect, explode.pos, rl.White)
+		if !explode.played {
+			rl.DrawTextureRec(spriteSheet1, explode.rect, explode.pos, rl.White)
+		}
 
 		rl.DrawText(strp, 500.0, 100.0, 40, rl.Black)
 		rl.DrawText(strw, 500.0, 200.0, 40, rl.Black)
 		rl.DrawText(strs, 500.0, 300.0, 40, rl.Black)
-		rl.DrawText(stre, 500.0, 500.0, 40, rl.Black)
+		if !explode.played {
+			rl.DrawText(stre, 500.0, 500.0, 40, rl.Black)
+		}
 		rl.DrawFPS(550, 100)
 
 		rl.EndDrawing()
 
+		if player.step {
+			if player.frame == 0 {
+				player.pos.Y = player.pos.Y - float32(player.region.TileSize.Y) + 48
+			}
+		} else {
+			player.pos.Y -= float32(player.region.TileSize.Y / FPS)
+		}
+		if slime.step {
+			if slime.frame == 0 {
+				slime.pos.X = slime.pos.X + float32(slime.region.TileSize.X) - 48
+			}
+		} else {
+			slime.pos.X += float32(slime.region.TileSize.X / FPS)
+		}
+
+		if explode.loop == false && explode.frame == 0 {
+			explode.played = true
+		}
 	}
 
 }
