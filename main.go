@@ -14,11 +14,15 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-// type Sprite struct {
-// 	name string
-// 	rect sa.RECT
-// 	frame int
-// }
+type GameSprite struct {
+	name   string
+	pos    rl.Vector2
+	region sa.Region
+	rect   rl.Rectangle
+	frame  int
+	step   bool
+	loop   bool
+}
 
 func main() {
 	var ScreenWidth int32 = 1729
@@ -43,53 +47,71 @@ func main() {
 	FPS := gameSpeed * 4 //4 frames for each tile
 	rl.SetTargetFPS(int32(FPS))
 
-	var rect sa.RECT
+	player := GameSprite{name: "player"}
+	player.region = page.Regions["player"]
+	player.frame = 0
+	player.pos.X = 350.0
+	player.pos.Y = 100.0
 
-	player := page.Regions["player"]
-	playerAf := 0
-	var playerRect rl.Rectangle
-	slimeWalk := page.Regions["slime_ew"]
-	slimeAf := 0
-	var slimeRect rl.Rectangle
-	tiles := page.Regions["region1"]
-	waterAf := 0
-	var waterRect rl.Rectangle
-	var step bool
-	var loop bool
+	slime := GameSprite{name: "slime"}
+	slime.region = page.Regions["slime_ew"]
+	slime.frame = 0
+	slime.pos.X = 350.0
+	slime.pos.Y = 200.0
+
+	water := GameSprite{name: "water"}
+	water.region = page.Regions["region1"]
+	water.frame = 0
+	water.pos.X = 350.0
+	water.pos.Y = 300.0
+
+	explode := GameSprite{name: "explode"}
+	explode.region = page.Regions["region5"]
+	explode.frame = 0
+	explode.pos.X = 350.0 - 48
+	explode.pos.Y = 500.0
 
 	for !rl.WindowShouldClose() {
+
+		var rect sa.RECT
+		rect, player.frame, player.step, player.loop, err = player.region.GetFrameRect("walk_north", player.frame)
+		if err == nil {
+			player.rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+		}
+		rect, slime.frame, slime.step, slime.loop, err = slime.region.GetFrameRect("east", slime.frame)
+		if err == nil {
+			slime.rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+		}
+
+		rect, water.frame, water.step, water.loop, err = water.region.GetFrameRect("water", water.frame)
+		if err == nil {
+			water.rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+		}
+
+		rect, explode.frame, explode.step, explode.loop, err = explode.region.GetFrameRect("explode", explode.frame)
+		if err == nil {
+			explode.rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+		}
+
+		strw := fmt.Sprintf("%v", water.frame)
+		strp := fmt.Sprintf("%v", player.frame)
+		strs := fmt.Sprintf("%v", slime.frame)
+		stre := fmt.Sprintf("%v", explode.frame)
 
 		rl.BeginDrawing()
 
 		//Background
 		rl.ClearBackground(rl.RayWhite)
 
-		rect, playerAf, step, loop, err = player.GetFrameRect("walk_north", playerAf)
-		if err == nil {
-			playerRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
-		}
-		rect, slimeAf, step, loop, err = slimeWalk.GetFrameRect("east", slimeAf)
-		if err == nil {
-			slimeRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
-		}
+		rl.DrawTextureRec(spriteSheet1, player.rect, player.pos, rl.White)
+		rl.DrawTextureRec(spriteSheet1, water.rect, water.pos, rl.White)
+		rl.DrawTextureRec(spriteSheet1, slime.rect, slime.pos, rl.White)
+		rl.DrawTextureRec(spriteSheet1, explode.rect, explode.pos, rl.White)
 
-		strw := fmt.Sprintf("%v", waterAf)
-		strp := fmt.Sprintf("%v", playerAf)
-		strs := fmt.Sprintf("%v", slimeAf)
-
-		rect, waterAf, step, loop, err = tiles.GetFrameRect("water", waterAf)
-		if err == nil {
-			waterRect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
-		}
-		if step || loop { //need to use
-			println("step or loop")
-		}
-		rl.DrawTextureRec(spriteSheet1, playerRect, rl.Vector2{X: 350.0, Y: 100.0}, rl.White)
-		rl.DrawTextureRec(spriteSheet1, waterRect, rl.Vector2{X: 350.0, Y: 200.0}, rl.White)
-		rl.DrawTextureRec(spriteSheet1, slimeRect, rl.Vector2{X: 350.0, Y: 300.0}, rl.White)
 		rl.DrawText(strp, 500.0, 100.0, 40, rl.Black)
 		rl.DrawText(strw, 500.0, 200.0, 40, rl.Black)
 		rl.DrawText(strs, 500.0, 300.0, 40, rl.Black)
+		rl.DrawText(stre, 500.0, 500.0, 40, rl.Black)
 		rl.DrawFPS(550, 100)
 
 		rl.EndDrawing()
