@@ -72,6 +72,31 @@ func main() {
 	explode.pos.X = 350.0 - 48
 	explode.pos.Y = 500.0
 
+	tile := GameSprite{name: "tile"}
+	tile.region = page.Regions["region1"]
+	tile.frame = 0
+	tile.pos.X = 0
+	tile.pos.Y = 0
+	target := rl.LoadRenderTexture(ScreenWidth, ScreenHeight)
+	var rect sa.RECT
+	rect, tile.frame, tile.step, tile.loop, err = tile.region.GetFrameRect("tile", tile.frame)
+	if err == nil {
+		tile.rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+	}
+	rl.BeginTextureMode(target)
+	//rl.ClearBackground(rl.White)
+	//rl.DrawText("This is drawn into a texture!", 50, 50, 20, rl.Red)
+	//rl.DrawCircle(200, 200, 50, rl.Blue)
+	for x := 0; x < 32; x++ {
+		for y := 0; y < 32; y++ {
+			tile.pos.X = float32(x * 48)
+			tile.pos.Y = float32(y * 48)
+			rl.DrawTextureRec(spriteSheet1, tile.rect, tile.pos, rl.White)
+		}
+	}
+
+	rl.EndTextureMode()
+
 	for !rl.WindowShouldClose() {
 
 		strw := fmt.Sprintf("%v", water.frame)
@@ -79,7 +104,6 @@ func main() {
 		strs := fmt.Sprintf("%v", slime.frame)
 		stre := fmt.Sprintf("%v", explode.frame)
 
-		var rect sa.RECT
 		rect, player.frame, player.step, player.loop, err = player.region.GetFrameRect("walk_north", player.frame)
 		if err == nil {
 			player.rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
@@ -102,7 +126,14 @@ func main() {
 		rl.BeginDrawing()
 
 		//Background
-		rl.ClearBackground(rl.RayWhite)
+		rl.ClearBackground(rl.Black)
+
+		rl.DrawTextureRec(
+			target.Texture,
+			rl.Rectangle{X: 0, Y: 0, Width: float32(target.Texture.Width), Height: -float32(target.Texture.Height)}, // Flip vertically
+			rl.Vector2{X: 0, Y: 0},
+			rl.White,
+		)
 
 		rl.DrawTextureRec(spriteSheet1, player.rect, player.pos, rl.White)
 		rl.DrawTextureRec(spriteSheet1, water.rect, water.pos, rl.White)
