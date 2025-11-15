@@ -15,23 +15,108 @@ import (
 )
 
 type GameSprite struct {
-	name   string
-	pos    rl.Vector2
-	region sa.Region
-	rect   rl.Rectangle
-	frame  int
+	Name   string
+	Pos    rl.Vector2
+	Region sa.Region
+	Rect   rl.Rectangle
+	Frame  int
 	step   bool
-	loop   bool
-	played bool
+	Loop   bool
+	Played bool
 }
 
-func main() {
-	var ScreenWidth int32 = 1729
-	var ScreenHeight int32 = 874
-	rl.InitWindow(ScreenWidth, ScreenHeight, "raylib [textures] example - sprite animation")
-	defer rl.CloseWindow()
+var frameCounter int
 
-	page, err := sa.Spriteatlas("", "atiles.atlas")
+func (g *GameSprite) Init(name string, region string, X float32, Y float32) {
+	g.Name = name
+	g.Region = page.Regions[region]
+	g.Frame = 0
+	g.Pos.X = X
+	g.Pos.Y = Y
+}
+func (g *GameSprite) X() float32 {
+	return g.Pos.X
+}
+func (g *GameSprite) Y() float32 {
+	return g.Pos.Y
+}
+
+func (g *GameSprite) centerX() float32 {
+	return g.X() + g.Width()/2.0
+}
+
+func (g *GameSprite) centerY() float32 {
+	return g.Y() + g.Height()/2.0
+}
+
+func (g *GameSprite) SetX(x float32) {
+	g.Pos.X = x
+}
+
+func (g *GameSprite) SetY(y float32) {
+	g.Pos.Y = y
+}
+
+func (g *GameSprite) Width() float32 {
+	return g.Rect.Width
+}
+
+func (g *GameSprite) Height() float32 {
+	return g.Rect.Height
+}
+func (g *GameSprite) Update(anim string) error {
+	var rect sa.RECT
+	var err error
+	rect, g.Frame, g.step, g.Loop, err = g.Region.GetFrameRect(anim, g.Frame)
+	if err == nil {
+		g.Rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+	}
+	return err
+}
+
+func (g *GameSprite) Step(dir int, stepSize int, speed int) {
+
+	if g.step && g.Frame == 0 { //animation does the movement
+		switch dir {
+		case 0: //north
+			g.SetY(g.Y() + float32(stepSize))
+		case 1: //east
+			g.SetX(g.X() + float32(stepSize))
+		case 2: //south
+			g.SetY(g.Y() - float32(stepSize))
+		case 3: //west
+			g.SetX(g.X() - float32(stepSize))
+		}
+	}
+	if !g.step {
+		switch dir {
+		case 0: //north
+			g.SetY(g.Y() - g.Height()/float32(speed))
+		case 1: //east
+			g.SetX(g.X() + g.Width()/float32(speed))
+		case 2: //south
+			g.SetY(g.Y() + g.Height()/float32(speed))
+		case 3: //west
+			g.SetX(g.X() - g.Width()/float32(speed))
+		}
+
+	}
+
+}
+
+var WorldWidth int32 = 1536
+var WorldHeight int32 = 1536
+var ScreenWidth int32 = 1729 //432
+var ScreenHeight int32 = 874 //432
+
+var spriteSheet1 rl.Texture2D
+var page *sa.Page
+var err error
+
+func init() {
+
+	rl.InitWindow(ScreenWidth, ScreenHeight, "raylib [textures] example - sprite animation")
+	page, err = sa.Spriteatlas("", "atiles.atlas")
 	if err != nil {
 		os.Exit(1)
 	}
@@ -40,136 +125,135 @@ func main() {
 	if page.Alpha_color != "" {
 		img = makeImgAlphaTransparent(page.Name, targetColor)
 	}
-	spriteSheet1 := rl.LoadTextureFromImage(img)
+	spriteSheet1 = rl.LoadTextureFromImage(img)
+}
+
+func main() {
+
+	defer rl.CloseWindow()
 	defer rl.UnloadTexture(spriteSheet1)
 
 	//TODO: Framerate needs fixing
-	var gameSpeed int = 4
-	FPS := gameSpeed //4 frames for each tile
+	gameSpeed := 4
+	FPS := 4
 	rl.SetTargetFPS(int32(FPS))
 
-	player := GameSprite{name: "player"}
-	player.region = page.Regions["player"]
-	player.frame = 0
-	player.pos.X = 350.0
-	player.pos.Y = 600.0
+	var player GameSprite
+	var slime GameSprite
+	var water GameSprite
+	var explode GameSprite
+	var tile GameSprite
 
-	slime := GameSprite{name: "slime"}
-	slime.region = page.Regions["slime_ew"]
-	slime.frame = 0
-	slime.pos.X = 350.0
-	slime.pos.Y = 200.0
+	player.Init("player", "player", 336.0, 576.0)
+	slime.Init("slime", "slime_ew", 336.0, 192.0)
+	water.Init("water", "region1", 336.0, 288.0)
+	explode.Init("explode", "region5", 336.0-48, 480.0)
+	tile.Init("tile", "region1", 0.0, 0.0)
+	err = tile.Update("tile")
 
-	water := GameSprite{name: "water"}
-	water.region = page.Regions["region1"]
-	water.frame = 0
-	water.pos.X = 350.0
-	water.pos.Y = 300.0
+	target := rl.LoadRenderTexture(WorldWidth, WorldHeight)
+	defer rl.UnloadRenderTexture(target)
 
-	explode := GameSprite{name: "explode"}
-	explode.region = page.Regions["region5"]
-	explode.frame = 0
-	explode.pos.X = 350.0 - 48
-	explode.pos.Y = 500.0
-
-	tile := GameSprite{name: "tile"}
-	tile.region = page.Regions["region1"]
-	tile.frame = 0
-	tile.pos.X = 0
-	tile.pos.Y = 0
-	target := rl.LoadRenderTexture(ScreenWidth, ScreenHeight)
-	var rect sa.RECT
-	rect, tile.frame, tile.step, tile.loop, err = tile.region.GetFrameRect("tile", tile.frame)
-	if err == nil {
-		tile.rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
-	}
+	//create background texture
 	rl.BeginTextureMode(target)
-	//rl.ClearBackground(rl.White)
-	//rl.DrawText("This is drawn into a texture!", 50, 50, 20, rl.Red)
-	//rl.DrawCircle(200, 200, 50, rl.Blue)
+
 	for x := 0; x < 32; x++ {
 		for y := 0; y < 32; y++ {
-			tile.pos.X = float32(x * 48)
-			tile.pos.Y = float32(y * 48)
-			rl.DrawTextureRec(spriteSheet1, tile.rect, tile.pos, rl.White)
+			tile.SetX(float32(x * 48))
+			tile.SetY(float32(y * 48))
+			rl.DrawTextureRec(spriteSheet1, tile.Rect, tile.Pos, rl.White)
 		}
 	}
 
 	rl.EndTextureMode()
 
+	camera := rl.Camera2D{}
+	var camTarget *GameSprite = &slime
+	camera.Target = rl.NewVector2(camTarget.centerX(), camTarget.centerY())
+	camera.Offset = rl.NewVector2(float32(ScreenWidth/2), float32(ScreenHeight/2))
+	camera.Rotation = 0.0
+	camera.Zoom = 1.0
+
 	for !rl.WindowShouldClose() {
 
-		strw := fmt.Sprintf("%v", water.frame)
-		strp := fmt.Sprintf("%v", player.frame)
-		strs := fmt.Sprintf("%v", slime.frame)
-		stre := fmt.Sprintf("%v", explode.frame)
+		strw := fmt.Sprintf("%v", water.Frame)
 
-		rect, player.frame, player.step, player.loop, err = player.region.GetFrameRect("walk_north", player.frame)
-		if err == nil {
-			player.rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
-		}
-		rect, slime.frame, slime.step, slime.loop, err = slime.region.GetFrameRect("east", slime.frame)
-		if err == nil {
-			slime.rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
-		}
+		strs := fmt.Sprintf("%v", slime.Frame)
+		stre := fmt.Sprintf("%v", explode.Frame)
 
-		rect, water.frame, water.step, water.loop, err = water.region.GetFrameRect("water", water.frame)
-		if err == nil {
-			water.rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+		if frameCounter > gameSpeed/FPS {
+			frameCounter = 0
+			err = player.Update("walk_north")
+			err = slime.Update("east")
+			err = water.Update("water")
+			err = explode.Update("explode")
+		} else {
+			frameCounter++
 		}
 
-		rect, explode.frame, explode.step, explode.loop, err = explode.region.GetFrameRect("explode", explode.frame)
-		if err == nil {
-			explode.rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
-		}
+		camera.Target = rl.NewVector2(camTarget.centerX(), camTarget.centerY())
 
 		rl.BeginDrawing()
 
 		//Background
 		rl.ClearBackground(rl.Black)
+		rl.BeginMode2D(camera)
 
+		t := target.Texture
 		rl.DrawTextureRec(
-			target.Texture,
-			rl.Rectangle{X: 0, Y: 0, Width: float32(target.Texture.Width), Height: -float32(target.Texture.Height)}, // Flip vertically
+			t,
+			rl.Rectangle{X: 0, Y: 0, Width: float32(t.Width), Height: -float32(t.Height)}, // Flip vertically
 			rl.Vector2{X: 0, Y: 0},
 			rl.White,
 		)
 
-		rl.DrawTextureRec(spriteSheet1, player.rect, player.pos, rl.White)
-		rl.DrawTextureRec(spriteSheet1, water.rect, water.pos, rl.White)
-		rl.DrawTextureRec(spriteSheet1, slime.rect, slime.pos, rl.White)
-		if !explode.played {
-			rl.DrawTextureRec(spriteSheet1, explode.rect, explode.pos, rl.White)
+		rl.DrawTextureRec(spriteSheet1, player.Rect, player.Pos, rl.White)
+		rl.DrawTextureRec(spriteSheet1, water.Rect, water.Pos, rl.White)
+		rl.DrawTextureRec(spriteSheet1, slime.Rect, slime.Pos, rl.White)
+		if !explode.Played {
+			rl.DrawTextureRec(spriteSheet1, explode.Rect, explode.Pos, rl.White)
 		}
+		strp := fmt.Sprintf("%v", int32(player.centerY()))
+		rl.DrawText(strp, int32(player.X())-10, int32(player.Y())-20, 20, rl.White)
 
-		rl.DrawText(strp, 500.0, 100.0, 40, rl.Black)
+		rl.EndMode2D()
+
 		rl.DrawText(strw, 500.0, 200.0, 40, rl.Black)
 		rl.DrawText(strs, 500.0, 300.0, 40, rl.Black)
-		if !explode.played {
+		if !explode.Played {
 			rl.DrawText(stre, 500.0, 500.0, 40, rl.Black)
 		}
+
 		rl.DrawFPS(550, 100)
 
 		rl.EndDrawing()
 
-		if player.step {
-			if player.frame == 0 {
-				player.pos.Y = player.pos.Y - float32(player.region.TileSize.Y) + 48
-			}
-		} else {
-			player.pos.Y -= float32(player.region.TileSize.Y / FPS)
-		}
-		if slime.step {
-			if slime.frame == 0 {
-				slime.pos.X = slime.pos.X + float32(slime.region.TileSize.X) - 48
-			}
-		} else {
-			slime.pos.X += float32(slime.region.TileSize.X / FPS)
+		//step upwards
+
+		player.Step(0, 48, gameSpeed)
+
+		slime.Step(1, 48, gameSpeed)
+
+		// if player.Step {
+		// 	if player.Frame == 0 {
+		// 		player.Pos.Y = player.Y() - float32(player.Height()) + 48
+		// 	}
+		// } else {
+		// 	player.Pos.Y -= player.Height() / float32(gameSpeed)
+		// }
+
+		// if slime.Step {
+		// 	if slime.Frame == 0 {
+		// 		slime.setX(slime.X() + slime.Width() - 48)
+		// 	}
+		// } else {
+		// 	slime.setX(slime.X() + slime.Width()/float32(FPS))
+		// }
+
+		if explode.Loop == false && explode.Frame == 0 {
+			explode.Played = true
 		}
 
-		if explode.loop == false && explode.frame == 0 {
-			explode.played = true
-		}
 	}
 
 }
