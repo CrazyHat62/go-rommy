@@ -14,9 +14,8 @@ type GameSprite struct {
 	Pos               rl.Vector2
 	Region            sa.Region
 	Rect              rl.Rectangle
-	Frame             int
-	step              bool
-	Loop              bool
+	CurrentAnim       sa.Anim
+	CurrentFrame      int
 	Played            bool
 	timeBetweenFrames float32
 }
@@ -26,7 +25,7 @@ var frameCounter int
 func (g *GameSprite) Init(name string, region string, X float32, Y float32) {
 	g.Name = name
 	g.Region = page.Regions[region]
-	g.Frame = 0
+	g.CurrentFrame = 0
 	g.Pos.X = X
 	g.Pos.Y = Y
 }
@@ -63,20 +62,27 @@ func (g *GameSprite) Height() float32 {
 	return g.Rect.Height
 }
 
-func (g *GameSprite) Update(anim string, dt float32) error {
+func (g *GameSprite) Update(animName string, dt float32) error {
 	var rect sa.RECT
-	var err error
 
-	rect, g.Frame, g.step, g.Loop, err = g.Region.GetFrameRect(anim, g.Frame)
-	if err == nil {
-		g.Rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
+	reg := &g.Region
+
+	anim, err := reg.GetAnimation(animName)
+	if err != nil {
+		return err
 	}
+	g.CurrentAnim = anim
+	rect, err = reg.GetFrameRect(anim, g.CurrentFrame)
+	if err != nil {
+		return err
+	}
+	g.Rect = rl.Rectangle{X: float32(rect.X), Y: float32(rect.Y), Width: float32(rect.Width), Height: float32(rect.Height)}
 	return err
 }
 
-func (g *GameSprite) Step(dir int, stepSize int, speed int) {
+func (g *GameSprite) StepDistance(dir int, stepSize int, speed int) {
 
-	if g.step && g.Frame == 0 { //animation does the movement
+	if g.CurrentAnim.Step && g.CurrentFrame == 0 { //animation does the movement
 		switch dir {
 		case 0: //north
 			g.SetY(g.Y() + float32(stepSize))
@@ -88,7 +94,7 @@ func (g *GameSprite) Step(dir int, stepSize int, speed int) {
 			g.SetX(g.X() - float32(stepSize))
 		}
 	}
-	if !g.step {
+	if !g.CurrentAnim.Step {
 		switch dir {
 		case 0: //north
 			g.SetY(g.Y() - g.Height()/float32(speed))
@@ -177,10 +183,10 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 
-		strw := fmt.Sprintf("%v", water.Frame)
+		strw := fmt.Sprintf("%v", water.CurrentFrame)
 
-		strs := fmt.Sprintf("%v", slime.Frame)
-		stre := fmt.Sprintf("%v", explode.Frame)
+		strs := fmt.Sprintf("%v", slime.CurrentFrame)
+		stre := fmt.Sprintf("%v", explode.CurrentFrame)
 
 		if frameCounter > gameSpeed/FPS {
 			frameCounter = 0
@@ -209,7 +215,6 @@ func main() {
 
 		rl.BeginMode2D(camera)
 
-
 		rl.DrawTextureRec(spriteSheet1, player.Rect, player.Pos, rl.White)
 		rl.DrawTextureRec(spriteSheet1, water.Rect, water.Pos, rl.White)
 		rl.DrawTextureRec(spriteSheet1, slime.Rect, slime.Pos, rl.White)
@@ -233,11 +238,11 @@ func main() {
 
 		//step upwards
 
-		player.Step(0, 48, gameSpeed)
+		player.StepDistance(0, 48, gameSpeed)
 
-		slime.Step(1, 48, gameSpeed)
+		slime.StepDistance(1, 48, gameSpeed)
 
-		if explode.Loop == false && explode.Frame == 0 {
+		if explode.CurrentAnim.Loop == false && explode.CurrentFrame == 0 {
 			explode.Played = true
 		}
 
