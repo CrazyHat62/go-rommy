@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-
 	"os"
 
 	sa "github.com/CrazyHat62/spriteatlas"
@@ -10,17 +9,15 @@ import (
 )
 
 type GameSprite struct {
-	Name              string
-	Pos               rl.Vector2
-	Region            sa.Region
-	Rect              rl.Rectangle
-	CurrentAnim       sa.Anim
-	CurrentFrame      int
-	Played            bool
-	timeBetweenFrames float32
+	Name         string
+	Pos          rl.Vector2
+	Region       sa.Region
+	Rect         rl.Rectangle
+	CurrentAnim  sa.Anim
+	CurrentFrame int
+	Played       bool
+	//	timeBetweenFrames float32
 }
-
-var frameCounter int
 
 func (g *GameSprite) Init(name string, region string, X float32, Y float32) {
 	g.Name = name
@@ -62,7 +59,7 @@ func (g *GameSprite) Height() float32 {
 	return g.Rect.Height
 }
 
-func (g *GameSprite) Update(animName string, dt float32) error {
+func (g *GameSprite) UpdateFrame(animName string, fnum int) error {
 	var rect sa.RECT
 
 	reg := &g.Region
@@ -72,7 +69,7 @@ func (g *GameSprite) Update(animName string, dt float32) error {
 		return err
 	}
 	g.CurrentAnim = anim
-	rect, err = reg.GetFrameRect(anim, g.CurrentFrame)
+	rect, err = reg.GetFrameRect(anim, fnum)
 	if err != nil {
 		return err
 	}
@@ -82,7 +79,8 @@ func (g *GameSprite) Update(animName string, dt float32) error {
 
 func (g *GameSprite) StepDistance(dir int, stepSize int, speed int) {
 
-	if g.CurrentAnim.Step && g.CurrentFrame == 0 { //animation does the movement
+	// if Step the animate once per animation
+	if g.CurrentAnim.Step && g.CurrentFrame == 0 {
 		switch dir {
 		case 0: //north
 			g.SetY(g.Y() + float32(stepSize))
@@ -112,8 +110,8 @@ func (g *GameSprite) StepDistance(dir int, stepSize int, speed int) {
 
 var WorldWidth int32 = 1536
 var WorldHeight int32 = 1536
-var ScreenWidth int32 = 1729 //432
-var ScreenHeight int32 = 874 //432
+var ScreenWidth int32 = 1536  //480  //432
+var ScreenHeight int32 = 1536 //480 //432
 
 var spriteSheet1 rl.Texture2D
 var page *sa.Page
@@ -139,11 +137,13 @@ func main() {
 	defer rl.CloseWindow()
 	defer rl.UnloadTexture(spriteSheet1)
 
-	var dt float32 = rl.GetFrameTime()
-	//TODO: Framerate needs fixing
-	gameSpeed := 4
-	FPS := 4
-	rl.SetTargetFPS(int32(FPS))
+	var gameSpeed float32 = 5
+	var animSpeed float32 = 4
+	// use some standard 1 unit of measurement / frames per animation
+	var timeBetweenFrames float32 = animSpeed / gameSpeed
+	var accumulatedTime float32 = 0.0
+
+	rl.SetTargetFPS(60)
 
 	var player GameSprite
 	var slime GameSprite
@@ -151,12 +151,14 @@ func main() {
 	var explode GameSprite
 	var tile GameSprite
 
-	player.Init("player", "player", 336.0, 576.0)
-	slime.Init("slime", "slime_ew", 336.0, 192.0)
-	water.Init("water", "region1", 336.0, 288.0)
-	explode.Init("explode", "region5", 336.0-48, 480.0)
+	pos := rl.Vector2{X: float32(WorldWidth) / 2, Y: float32(WorldHeight) / 2}
+
+	player.Init("player", "player", pos.X, pos.Y)
+	slime.Init("slime", "slime_ew", pos.X, pos.Y+48)
+	water.Init("water", "region1", pos.X, pos.Y+96)
+	explode.Init("explode", "region5", pos.X, pos.Y+144)
 	tile.Init("tile", "region1", 0.0, 0.0)
-	err = tile.Update("tile", 0.0)
+	err = tile.UpdateFrame("tile", 0.0)
 
 	target := rl.LoadRenderTexture(WorldWidth, WorldHeight)
 	defer rl.UnloadRenderTexture(target)
@@ -175,28 +177,35 @@ func main() {
 	rl.EndTextureMode()
 
 	camera := rl.Camera2D{}
-	var camTarget *GameSprite = &slime
+	var camTarget *GameSprite = &player
+	//set player as target
 	camera.Target = rl.NewVector2(camTarget.centerX(), camTarget.centerY())
-	camera.Offset = rl.NewVector2(float32(ScreenWidth/2), float32(ScreenHeight/2))
+	//set offset to camera center
+	//	camera.Offset = rl.NewVector2(float32(ScreenWidth/2), float32(ScreenHeight/2))
 	camera.Rotation = 0.0
 	camera.Zoom = 1.0
 
 	for !rl.WindowShouldClose() {
 
-		strw := fmt.Sprintf("%v", water.CurrentFrame)
+		dt := rl.GetFrameTime()
 
-		strs := fmt.Sprintf("%v", slime.CurrentFrame)
-		stre := fmt.Sprintf("%v", explode.CurrentFrame)
+		accumulatedTime += dt
 
-		if frameCounter > gameSpeed/FPS {
-			frameCounter = 0
-			err = player.Update("walk_north", dt)
-			err = slime.Update("east", dt)
-			err = water.Update("water", dt)
-			err = explode.Update("explode", dt)
-		} else {
-			frameCounter++
+		if timeBetweenFrames <= accumulatedTime*gameSpeed {
+			accumulatedTime = 0.0
+			player.CurrentFrame++
+			player.CurrentFrame = player.CurrentFrame % player.CurrentAnim.Count
+			slime.CurrentFrame++
+			slime.CurrentFrame = slime.CurrentFrame % slime.CurrentAnim.Count
+			water.CurrentFrame++
+			water.CurrentFrame = water.CurrentFrame % water.CurrentAnim.Count
+			explode.CurrentFrame++
+			explode.CurrentFrame = player.CurrentFrame % player.CurrentAnim.Count
 		}
+		err = player.UpdateFrame("walk_north", player.CurrentFrame)
+		err = slime.UpdateFrame("east", slime.CurrentFrame)
+		err = water.UpdateFrame("water", water.CurrentFrame)
+		err = explode.UpdateFrame("explode", explode.CurrentFrame)
 
 		camera.Target = rl.NewVector2(camTarget.centerX(), camTarget.centerY())
 
@@ -213,7 +222,7 @@ func main() {
 			rl.White,
 		)
 
-		rl.BeginMode2D(camera)
+		//rl.BeginMode2D(camera)
 
 		rl.DrawTextureRec(spriteSheet1, player.Rect, player.Pos, rl.White)
 		rl.DrawTextureRec(spriteSheet1, water.Rect, water.Pos, rl.White)
@@ -224,13 +233,13 @@ func main() {
 		strp := fmt.Sprintf("%v", int32(player.centerY()))
 		rl.DrawText(strp, int32(player.X())-10, int32(player.Y())-20, 20, rl.White)
 
-		rl.EndMode2D()
+		//rl.EndMode2D()
 
-		rl.DrawText(strw, 500.0, 200.0, 40, rl.Black)
-		rl.DrawText(strs, 500.0, 300.0, 40, rl.Black)
-		if !explode.Played {
-			rl.DrawText(stre, 500.0, 500.0, 40, rl.Black)
-		}
+		// rl.DrawText(strw, 500.0, 200.0, 40, rl.Black)
+		// rl.DrawText(strs, 500.0, 300.0, 40, rl.Black)
+		// if !explode.Played {
+		// 	rl.DrawText(stre, 500.0, 500.0, 40, rl.Black)
+		// }
 
 		rl.DrawFPS(550, 100)
 
@@ -238,9 +247,9 @@ func main() {
 
 		//step upwards
 
-		player.StepDistance(0, 48, gameSpeed)
+		//player.StepDistance(0, 48, int(gameSpeed))
 
-		slime.StepDistance(1, 48, gameSpeed)
+		//slime.StepDistance(1, 48, int(gameSpeed))
 
 		if explode.CurrentAnim.Loop == false && explode.CurrentFrame == 0 {
 			explode.Played = true
