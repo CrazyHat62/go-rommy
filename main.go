@@ -110,8 +110,8 @@ func (g *GameSprite) StepDistance(dir int, stepSize int, speed int) {
 
 var WorldWidth int32 = 1536
 var WorldHeight int32 = 1536
-var ScreenWidth int32 = 1536  //480  //432
-var ScreenHeight int32 = 1536 //480 //432
+var ScreenWidth int32 = 528  //432
+var ScreenHeight int32 = 528 //432
 
 var spriteSheet1 rl.Texture2D
 var page *sa.Page
@@ -151,13 +151,15 @@ func main() {
 	var explode GameSprite
 	var tile GameSprite
 
-	pos := rl.Vector2{X: float32(WorldWidth) / 2, Y: float32(WorldHeight) / 2}
+	pos := rl.Vector2{X: 384, Y: 384}
 
 	player.Init("player", "player", pos.X, pos.Y)
 	slime.Init("slime", "slime_ew", pos.X, pos.Y+48)
 	water.Init("water", "region1", pos.X, pos.Y+96)
 	explode.Init("explode", "region5", pos.X, pos.Y+144)
+
 	tile.Init("tile", "region1", 0.0, 0.0)
+
 	err = tile.UpdateFrame("tile", 0.0)
 
 	target := rl.LoadRenderTexture(WorldWidth, WorldHeight)
@@ -171,6 +173,8 @@ func main() {
 			tile.SetX(float32(x * 48))
 			tile.SetY(float32(y * 48))
 			rl.DrawTextureRec(spriteSheet1, tile.Rect, tile.Pos, rl.White)
+			strp := fmt.Sprintf("%v,%v", int32(x), int32(y))
+			rl.DrawText(strp, int32(tile.Pos.X), int32(tile.Pos.Y), 10, rl.Black)
 		}
 	}
 
@@ -181,9 +185,10 @@ func main() {
 	//set player as target
 	camera.Target = rl.NewVector2(camTarget.centerX(), camTarget.centerY())
 	//set offset to camera center
-	//	camera.Offset = rl.NewVector2(float32(ScreenWidth/2), float32(ScreenHeight/2))
+	camera.Offset = rl.NewVector2(float32(ScreenWidth/2), float32(ScreenHeight/2))
 	camera.Rotation = 0.0
 	camera.Zoom = 1.0
+	//camera.Offset = rl.Vector2Zero() //use this to center it on the player if you need to.
 
 	for !rl.WindowShouldClose() {
 
@@ -214,6 +219,7 @@ func main() {
 		//Background
 		rl.ClearBackground(rl.Black)
 
+		rl.BeginMode2D(camera)
 		t := target.Texture
 		rl.DrawTextureRec(
 			t,
@@ -221,11 +227,8 @@ func main() {
 			rl.Vector2{X: 0, Y: 0},
 			rl.White,
 		)
-
-		//rl.BeginMode2D(camera)
-
 		rl.DrawTextureRec(spriteSheet1, player.Rect, player.Pos, rl.White)
-		rl.DrawTextureRec(spriteSheet1, water.Rect, water.Pos, rl.White)
+		rl.DrawTextureRec(spriteSheet1, water.Rect, rl.Vector2{X: 768, Y: 864}, rl.White)
 		rl.DrawTextureRec(spriteSheet1, slime.Rect, slime.Pos, rl.White)
 		if !explode.Played {
 			rl.DrawTextureRec(spriteSheet1, explode.Rect, explode.Pos, rl.White)
@@ -233,7 +236,7 @@ func main() {
 		strp := fmt.Sprintf("%v", int32(player.centerY()))
 		rl.DrawText(strp, int32(player.X())-10, int32(player.Y())-20, 20, rl.White)
 
-		//rl.EndMode2D()
+		rl.EndMode2D()
 
 		// rl.DrawText(strw, 500.0, 200.0, 40, rl.Black)
 		// rl.DrawText(strs, 500.0, 300.0, 40, rl.Black)
@@ -251,9 +254,9 @@ func main() {
 
 		//slime.StepDistance(1, 48, int(gameSpeed))
 
-		if explode.CurrentAnim.Loop == false && explode.CurrentFrame == 0 {
-			explode.Played = true
-		}
+		//		if !explode.CurrentAnim.Loop && explode.CurrentFrame == 0 {
+		//			explode.Played = true
+		//		}
 
 	}
 
