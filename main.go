@@ -59,7 +59,7 @@ func (g *GameSprite) Height() float32 {
 	return g.Rect.Height
 }
 
-func (g *GameSprite) UpdateFrame(animName string, fnum int) error {
+func (g *GameSprite) GetFrame(animName string, fnum int) error {
 	var rect sa.RECT
 
 	reg := &g.Region
@@ -160,7 +160,7 @@ func main() {
 
 	tile.Init("tile", "region1", 0.0, 0.0)
 
-	err = tile.UpdateFrame("tile", 0.0)
+	err = tile.GetFrame("tile", 0.0)
 
 	target := rl.LoadRenderTexture(WorldWidth, WorldHeight)
 	defer rl.UnloadRenderTexture(target)
@@ -190,30 +190,23 @@ func main() {
 	camera.Zoom = 1.0
 	//camera.Offset = rl.Vector2Zero() //use this to center it on the player if you need to.
 
+	var getFrame bool = true
+
 	for !rl.WindowShouldClose() {
 
 		dt := rl.GetFrameTime()
 
-		accumulatedTime += dt
+		accumulatedTime += dt * gameSpeed
 
-		if timeBetweenFrames <= accumulatedTime*gameSpeed {
-			accumulatedTime = 0.0
-			player.CurrentFrame++
-			player.CurrentFrame = player.CurrentFrame % player.CurrentAnim.Count
-			slime.CurrentFrame++
-			slime.CurrentFrame = slime.CurrentFrame % slime.CurrentAnim.Count
-			water.CurrentFrame++
-			water.CurrentFrame = water.CurrentFrame % water.CurrentAnim.Count
-			explode.CurrentFrame++
-			explode.CurrentFrame = player.CurrentFrame % player.CurrentAnim.Count
+		if getFrame {
+			_ = player.GetFrame("walk_north", player.CurrentFrame)
+			_ = slime.GetFrame("east", slime.CurrentFrame)
+			_ = water.GetFrame("water", water.CurrentFrame)
+			_ = explode.GetFrame("explode", explode.CurrentFrame)
+			getFrame = false
 		}
-		err = player.UpdateFrame("walk_north", player.CurrentFrame)
-		err = slime.UpdateFrame("east", slime.CurrentFrame)
-		err = water.UpdateFrame("water", water.CurrentFrame)
-		err = explode.UpdateFrame("explode", explode.CurrentFrame)
-
-		camera.Target = rl.NewVector2(camTarget.centerX(), camTarget.centerY())
-
+		//camera.Target = rl.NewVector2(camTarget.centerX(), camTarget.centerY())
+		camera.Target.Y += (camTarget.centerY() - camera.Target.Y) * 0.02
 		rl.BeginDrawing()
 
 		//Background
@@ -247,6 +240,28 @@ func main() {
 		rl.DrawFPS(550, 100)
 
 		rl.EndDrawing()
+		//player.Pos.Y -= dt * 15 * gameSpeed
+
+		if timeBetweenFrames <= accumulatedTime {
+			accumulatedTime = 0.0
+			player.CurrentFrame++
+			player.CurrentFrame = player.CurrentFrame % player.CurrentAnim.Count
+			slime.CurrentFrame++
+			slime.CurrentFrame = slime.CurrentFrame % slime.CurrentAnim.Count
+			water.CurrentFrame++
+			water.CurrentFrame = water.CurrentFrame % water.CurrentAnim.Count
+			explode.CurrentFrame++
+			explode.CurrentFrame = player.CurrentFrame % player.CurrentAnim.Count
+			getFrame = true
+		}
+		//camera.Offset.Y += -0.33
+		if accumulatedTime == 0 {
+			player.Pos.Y -= tile.Height() / float32(player.CurrentAnim.Count)
+			if player.Pos.Y <= 0 {
+				player.Pos.Y = float32(WorldHeight) - tile.Height()
+			}
+			//camera.Offset = rl.NewVector2(float32(ScreenWidth/2), float32(ScreenHeight/2))
+		}
 
 		//step upwards
 
