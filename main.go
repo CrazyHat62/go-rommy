@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	sa "github.com/CrazyHat62/spriteatlas"
+	sa "github.com/CrazyHat62/SpriteAtlas"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 

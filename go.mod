@@ -5,7 +5,7 @@ go 1.25.2
 //replace github.com/CrazyHat62/spriteatlas => ./libs/spriteatlas // Relative path example
 
 require (
-	github.com/CrazyHat62/spriteatlas v0.0.0-20251029204420-80c95cb9b3b0
+	github.com/CrazyHat62/SpriteAtlas v0.1.1
 	github.com/gen2brain/raylib-go/raylib v0.55.1
 	golang.org/x/image v0.32.0
 )

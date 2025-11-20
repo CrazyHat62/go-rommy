@@ -12,14 +12,14 @@
 # region contains : name regionBounds tileSizeOverride animationName,row,col,count
 # frame contains : name index size pos ... and may be anywhere in the spritesheet, and in order in spriteAtlas
 
-page atiles.bmp 255,0,255,255 true 1729,874 1,1,1,1
-
 # this sheet has preset regions which affect vertical spacing between them. 
 # the horizontal is contigeous except on the borders. I dont get this often enough to build an app to do it.
 
 # step ~ only move animation after each cycle
 # once ~ go through entire animation once only
 # TODO: require an anchor especially for blocks larger than one 48x48
+
+page atiles.bmp 255,0,255,255 true 1729,874 1,1,1,1
 
 region region1 1,1 48,48 
 tile,1,1,1  
