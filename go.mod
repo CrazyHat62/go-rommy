@@ -2,7 +2,8 @@ module Rommy2
 
 go 1.25.2
 
-//replace github.com/CrazyHat62/spriteatlas => ./libs/spriteatlas // Relative path example
+// Relative path example
+//replace github.com/CrazyHat62/SpriteAtlas => ./libs/spriteatlas 
 
 require (
 	github.com/CrazyHat62/SpriteAtlas v0.1.1

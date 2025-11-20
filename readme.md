@@ -1,7 +1,7 @@
 # GO ROMMY
 
 This is an exercise in writing a game, building a library for sprite atlases, 
-and learning Go. The spriteAtlas could be a reader but chose to do it this way
+and learning Go. The SpriteAtlas could be a reader but chose to do it this way
 because everything is still fuzzy.  
 
 ## SpriteAtlas
@@ -15,7 +15,7 @@ simplified at any time.
 
 in the go.mod file :
 
-    github.com/CrazyHat62/SpriteAtlas v0.1.1
+    github.com/CrazyHat62/SpriteAtlas v0.1.2
 
 in your main.go
 
@@ -31,8 +31,11 @@ import (
 
 ## Go Mod
 
-To use sprite atlas during development (and make changes) we simply made spriteAtlas a submodule, but this doesn't need to be the case as it is a seperate
+To use sprite atlas during development (and make changes) we simply made SpriteAtlas a submodule, but this doesn't need to be the case as it is a separate
 go repository and can be imported as usual 
 
-    replace spriteatlas => ../spriteatlas // Relative path for submodule found in mod
+// Relative path example
+replace github.com/CrazyHat62/SpriteAtlas => ./libs/spriteatlas 
+
+
 
