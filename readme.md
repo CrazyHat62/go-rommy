@@ -37,5 +37,7 @@ go repository and can be imported as usual
 // Relative path example
 replace github.com/CrazyHat62/SpriteAtlas => ./libs/spriteatlas 
 
-
+NOTE:
+According to the web. 
+Tile images: The tileset, created by Anders Kaseorg, has been explicitly placed in the public domain. It is not covered by the MIT licence.
 
